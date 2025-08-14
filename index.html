@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SBTE RegID Access - Hacker Mode</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Courier New", monospace;
+      background: black;
+      color: #00ff88;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Background with blinking eye GIF */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('dark-red-eye-blink.gif') center/cover no-repeat;
+      z-index: -2;
+      opacity: 0.2;
+      animation: fadeEye 6s infinite;
+    }
+
+    /* Slight fade in/out effect for creepy vibe */
+    @keyframes fadeEye {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.25; }
+    }
+
+    /* Matrix background overlay */
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #00ff88;
+      border-radius: 8px;
+      box-shadow: 0 0 20px #00ff88;
+    }
+
+    h1 {
+      font-size: 2rem;
+      text-shadow: 0 0 10px #00ff88;
+    }
+
+    .slogan {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      color: #00ffaa;
+      text-shadow: 0 0 5px #00ffaa;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      background: black;
+      border: 2px solid #00ff88;
+      color: #00ff88;
+      border-radius: 5px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    input::placeholder {
+      color: #00ff88aa;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: 2px solid #00ff88;
+      background: black;
+      color: #00ff88;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #00ff88;
+      color: black;
+      box-shadow: 0 0 15px #00ff88;
+    }
+
+    .error {
+      margin-top: 15px;
+      color: #ff4444;
+      text-shadow: 0 0 5px #ff0000;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+  <h1>⚡ SBTE Bihar Access Panel ⚡</h1>
+  <div class="slogan">"Your Info, Our Access"</div>
+  <div class="row">
+    <input id="regId" type="text" placeholder="> Enter RegID (e.g. 583100)">
+    <button onclick="openPDF()">ACCESS</button>
+  </div>
+  <div id="error" class="error"></div>
+</div>
+
+<script>
+function openPDF() {
+  const regId = document.getElementById("regId").value.trim();
+  const errorDiv = document.getElementById("error");
+
+  errorDiv.textContent = "";
+  if (!regId) {
+    errorDiv.textContent = "⚠️ ERROR: RegID missing. Access Denied.";
+    return;
+  }
+
+  const pdfUrl = `https://sbte-api.anantdrishti.com/examform/downloadForm?regId=${encodeURIComponent(regId)}`;
+  window.open(pdfUrl, "_blank");
+}
+
+/* Matrix animation */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*";
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#00ff88";
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+
+setInterval(drawMatrix, 35);
+</script>
+
+</body>
+</html>
