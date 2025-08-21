@@ -64,7 +64,6 @@
       background: rgba(0, 40, 0, 0.5);
       box-shadow: inset 0 0 15px #00ff00;
       position: relative;
-      overflow: hidden;
     }
 
     .section h2 {
@@ -72,22 +71,6 @@
       margin-bottom: 14px;
       color: #00ff00;
       text-shadow: 0 0 10px #00ff00;
-      position: relative;
-    }
-    /* CRT scan-line animation */
-    .section h2::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: #00ff00;
-      animation: scanline 2s infinite linear;
-    }
-    @keyframes scanline {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
     }
 
     .row {
@@ -146,13 +129,26 @@
       margin-top: 15px;
       color: #00ff00;
       font-size: 14px;
-      min-height: 20px;
+      min-height: 60px;
       font-family: monospace;
       text-align: left;
       white-space: pre-line;
       border-top: 1px dashed #00ff00;
-      padding-top: 5px;
+      padding-top: 8px;
+      line-height: 1.4em;
     }
+    .log-line {
+      opacity: 0.9;
+      animation: fadeIn 0.4s ease;
+      text-shadow: 0 0 6px #00ff00;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to   { opacity: 0.9; transform: translateX(0); }
+    }
+    .success { color: #00ff00; }
+    .loading { color: #55ff55; }
+    .warn    { color: #ffaa00; }
   </style>
 </head>
 <body>
@@ -190,40 +186,51 @@
 </div>
 
 <script>
-function logStatus(msg) {
+let logHistory = [];
+
+function logStatus(msg, type="loading") {
   const status = document.getElementById("status");
-  status.textContent += "\\n> " + msg;
-  status.scrollTop = status.scrollHeight;
+
+  let icon = "[*] ";
+  if(type==="success") icon = "[+] ";
+  if(type==="warn")    icon = "[!] ";
+
+  logHistory.unshift(icon + msg);
+  if(logHistory.length > 3) logHistory.pop();
+
+  status.innerHTML = logHistory
+    .map(line => `<div class="log-line ${type}">${line}</div>`)
+    .join("");
 }
 
 function openAdmit() {
   const regId = document.getElementById("examReg").value.trim();
-  if (!regId) { logStatus("⚠️ Enter Admit/Form RegID."); return; }
-  logStatus("⏳ Requesting Admit Card for RegID " + regId);
+  if (!regId) { logStatus("Enter Admit/Form RegID", "warn"); return; }
+  logStatus("Requesting Admit Card for " + regId, "loading");
   const url = `https://sbte-api.anantdrishti.com/examform/admitCard?regId=${encodeURIComponent(regId)}`;
   window.open(url, "_blank");
-  logStatus("✅ Admit Card request sent.");
+  logStatus("Admit Card request sent.", "success");
 }
 
 function openForm() {
   const regId = document.getElementById("examReg").value.trim();
-  if (!regId) { logStatus("⚠️ Enter Admit/Form RegID."); return; }
-  logStatus("⏳ Requesting Exam Form for RegID " + regId);
+  if (!regId) { logStatus("Enter Admit/Form RegID", "warn"); return; }
+  logStatus("Requesting Exam Form for " + regId, "loading");
   const url = `https://sbte-api.anantdrishti.com/examform/downloadForm?regId=${encodeURIComponent(regId)}`;
   window.open(url, "_blank");
-  logStatus("✅ Exam Form request sent.");
+  logStatus("Exam Form request sent.", "success");
 }
 
 function openSubject() {
   const regId = document.getElementById("subjectReg").value.trim();
-  if (!regId) { logStatus("⚠️ Enter Subject Finder RegID."); return; }
-  logStatus("⏳ Requesting Subject Finder for RegID " + regId);
+  if (!regId) { logStatus("Enter Subject Finder RegID", "warn"); return; }
+  logStatus("Requesting Subject Finder for " + regId, "loading");
   const url = `https://sbte-api.anantdrishti.com/enrollment/downloadForm?regId=${encodeURIComponent(regId)}`;
   window.open(url, "_blank");
-  logStatus("✅ Subject Finder request sent.");
+  logStatus("Subject Finder request sent.", "success");
 }
 
-/* Pure Green Matrix animation */
+/* Matrix animation */
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
